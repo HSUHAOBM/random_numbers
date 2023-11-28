@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隨機數字操作</title>
+    <style>
+        #getNumberResultAll{
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>隨機數字操作</h1>
+
+    <!-- 取數字按鈕 -->
+    <button onclick="get_random_number()">取數字</button>
+    <div id="getNumberResult">
+        <p>取數字結果：</p>
+        <span id="getNumberResultAll"></span>
+    </div>
+
+    <hr>
+
+    <!-- 顯示按鈕 -->
+    <button onclick="show_numbers()">顯示</button>
+    <p id="showNumbersResult"></p>
+
+    <hr>
+    <!-- 初始化按鈕 -->
+    <button onclick="init_numbers()">初始化</button>
+    <p id="initResult"></p>
+
+    <script>
+
+        const resultSpan = document.getElementById('getNumberResultAll');
+
+        function get_random_number() {
+            fetch('/number/get/{{ num_count }}/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新取數字結果
+                    console.log(data)
+                    if (data.random_number){
+                        resultSpan.innerHTML += `<span>${JSON.stringify(data.random_number)}</span><br>`;
+                        resultSpan.innerHTML += `<br/>`
+                    }else{
+                        resultSpan.innerHTML += `<span>${JSON.stringify(data.message)},數字已全被抽光了 </span><br>`;
+                    }
+                });
+        }
+
+        function show_numbers() {
+            fetch('/number/show/{{ num_count }}/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新顯示結果
+                    document.getElementById('showNumbersResult').innerText = `顯示結果：${JSON.stringify(data.number_set)}`;
+                });
+        }
+
+        function init_numbers() {
+            fetch('/number/init/{{ num_count }}/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新初始化结果
+                    if (data.ok){
+                        document.getElementById('initResult').innerText = `初始化結果：${JSON.stringify(data.number_set)}`;
+                        resultSpan.innerHTML = "";
+                    }else{
+                        document.getElementById('initResult').innerText = `初始化結果：${JSON.stringify(data.message)}`;
+                    }
+                });
+        }
+    </script>
+
+</body>
+</html>

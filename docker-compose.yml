@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: django_eu_web
+    command: python manage.py runserver 0.0.0.0:8087
+    volumes:
+      - .:/app
+    ports:
+      - "8087:8087"
+    environment:
+      - TZ=Asia/Taipei
+    depends_on:
+      - redis
+  redis:
+      image: "redis:alpine"
+      volumes:
+        - redis_django-data:/data
+volumes:
+  redis_django-data:

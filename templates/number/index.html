@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隨機取數字</title>
+    <style>
+        label {
+            display: block;
+            margin-bottom: 5px;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <form id="numberForm">
+        <label for="num_count">請輸入隨機數字的最大值：</label>
+        <input type="number" name="num_count" id="num_count" required>
+
+        <label for="identifier">請設定名稱：</label>
+        <input type="text" name="identifier" id="identifier" required>
+
+        <input type="button" value="提交" onclick="submitForm()">
+    </form>
+    <script>
+        async function submitForm() {
+            var numCount = document.getElementById('num_count').value;
+            var identifier = document.getElementById('identifier').value + 'django';
+
+            // 使用 crypto.subtle.digest 進行 SHA-256 加密
+            const encoder = new TextEncoder();
+            const data = encoder.encode(identifier);
+            const buffer = await crypto.subtle.digest('SHA-256', data);
+
+            // 將加密結果轉換為十六進制字符串
+            const hashArray = Array.from(new Uint8Array(buffer));
+            const hashedIdentifier = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+            var url = '/random_number/' + numCount + '/' + hashedIdentifier + '/';
+
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>
