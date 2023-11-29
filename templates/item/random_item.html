@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>隨機操作</title>
     <style>
-        #getNumberResultAll{
+        #get_item_result{
             font-size: 30px;
         }
     </style>
@@ -17,11 +17,13 @@
     <hr>
     <br>
 
-    <!-- 取數字按鈕 -->
+    <!-- 取項目按鈕 -->
     <button onclick="get_random_item()">取</button>
-    <div id="getNumberResult">
+    <div id="get_item_result">
         <p>取 結果：</p>
-        <span id="getNumberResultAll"></span>
+        <div id="result_list"></div>
+        <br>
+        <div id="result_container"></div>
     </div>
 
     <hr>
@@ -36,19 +38,23 @@
     <p id="initResult"></p>
 
     <script>
-
-        const result_span = document.getElementById('getNumberResultAll');
+        const result_list = document.getElementById('result_list');
+        const result = document.getElementById('result_container');
         const show_span = document.getElementById('showItemsResult');
+
         function get_random_item() {
             fetch('/item/get/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
-                    // 更新取數字結果
+                    // 更新取結果
                     if (data.ok){
-                        result_span.innerHTML += `<span>${data.random_item}</span><br>`;
-                        result_span.innerHTML += `<br/>`
+                        result.innerHTML = `<span>${data.random_item}</span><br>`;
+                        result.innerHTML += `<br/>`
+
+                        result_list.innerHTML += data.random_item +',  '
+
                     }else{
-                        result_span.innerHTML += `<span>${data.message}, 已被抽光了 </span><br>`;
+                        result.innerHTML = `<span>${data.message}, 已被抽光了 </span><br>`;
                     }
                 });
         }
@@ -74,7 +80,8 @@
                     // 更新初始化结果
                     if (data.ok){
                         document.getElementById('initResult').innerText = `初始化結果：${data.items_set.join(' ')}`;
-                        result_span.innerHTML = "";
+                        result.innerHTML = "";
+                        result_list.innerHTML = "";
                         show_span.innerHTML = "";
                     }else{
                         document.getElementById('initResult').innerText = `初始化結果：${data.message}`;
