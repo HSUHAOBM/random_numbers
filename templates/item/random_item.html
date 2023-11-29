@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隨機操作</title>
+    <style>
+        #getNumberResultAll{
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>隨機取出</h1>
+    「{{ init_items_set|join:' , ' }}」
+    <br>
+    <hr>
+    <br>
+
+    <!-- 取數字按鈕 -->
+    <button onclick="get_random_item()">取</button>
+    <div id="getNumberResult">
+        <p>取 結果：</p>
+        <span id="getNumberResultAll"></span>
+    </div>
+
+    <hr>
+
+    <!-- 顯示按鈕 -->
+    <button onclick="show_items()">未取出顯示</button>
+    <p id="showItemsResult"></p>
+
+    <hr>
+    <!-- 初始化按鈕 -->
+    <button onclick="init_items()">初始化</button>
+    <p id="initResult"></p>
+
+    <script>
+
+        const result_span = document.getElementById('getNumberResultAll');
+        const show_span = document.getElementById('showItemsResult');
+        function get_random_item() {
+            fetch('/item/get/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新取數字結果
+                    if (data.ok){
+                        result_span.innerHTML += `<span>${data.random_item}</span><br>`;
+                        result_span.innerHTML += `<br/>`
+                    }else{
+                        result_span.innerHTML += `<span>${data.message}, 已被抽光了 </span><br>`;
+                    }
+                });
+        }
+
+        function show_items() {
+            fetch('/item/show/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新顯示結果
+                    if (data.ok){
+                        const itemsResult = data.items_set.join(' ');
+                        show_span.innerText = `顯示結果：${itemsResult}`;
+                    }else{
+                        show_span.innerHTML = `<span> 請初始化, 已被抽光了 </span><br>`;
+                    }
+                });
+        }
+
+        function init_items() {
+            fetch('/item/init/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新初始化结果
+                    if (data.ok){
+                        document.getElementById('initResult').innerText = `初始化結果：${data.items_set.join(' ')}`;
+                        result_span.innerHTML = "";
+                        show_span.innerHTML = "";
+                    }else{
+                        document.getElementById('initResult').innerText = `初始化結果：${data.message}`;
+                    }
+                });
+        }
+        // 檢核網址正確性
+        function check_url() {
+            fetch('/item/check/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新初始化结果
+                    if (data.ok){
+                    }else{
+                        let url = '/item/';
+                        window.location.href = url;
+                    }
+                });
+        }
+        check_url()
+    </script>
+</body>
+</html>

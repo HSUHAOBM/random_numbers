@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隨機</title>
+    <style>
+        label {
+            display: block;
+            margin-bottom: 5px;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <form id="itemForm">
+        <label for="item_list">請輸入隨機的 Item（逗號分隔）：</label>
+        <textarea name="item_list" id="item_list" style="width: 300px; height: 100px;" required></textarea>
+        <input type="button" value="提交" onclick="submitForm()">
+    </form>
+    <script>
+        async function submitForm() {
+            let items = document.getElementById('item_list').value;
+
+            // 使用 fetch 發送 POST 請求到後端處理跳轉
+            fetch('/item/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    items: items,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.ok){
+                    let url = '/item/random/' + data.identifier;
+                    window.location.href = url;
+                }else{
+
+
+                }
+            });
+        }
+    </script>
+</body>
+</html>
