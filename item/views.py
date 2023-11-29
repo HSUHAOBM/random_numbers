@@ -97,9 +97,6 @@ def item_init(request, identifier):
     else:
         init_items_set = cache.get(cache_key + 'init')
 
-        if init_items_set is None:
-            return redirect('/')
-
         cache.set(cache_key, init_items_set, 3600)
         content = {'ok': True, 'items_set': cache.get(cache_key)}
 

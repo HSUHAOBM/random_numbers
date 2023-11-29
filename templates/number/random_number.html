@@ -5,73 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>隨機數字操作</title>
     <style>
-        #getNumberResultAll{
+        #get_number{
             font-size: 30px;
         }
     </style>
 </head>
 <body>
     <h1>隨機數字操作</h1>
+    「 {{ init_numbes_set|join:' , ' }} 」
+    <br>
+    <hr>
+    <br>
 
     <!-- 取數字按鈕 -->
     <button onclick="get_random_number()">取數字</button>
-    <div id="getNumberResult">
+    <div id="get_number">
         <p>取數字結果：</p>
-        <span id="getNumberResultAll"></span>
+        <div id="result_list"></div>
+        <br>
+        <div id="result_container"></div>
     </div>
 
     <hr>
 
     <!-- 顯示按鈕 -->
-    <button onclick="show_numbers()">顯示</button>
-    <p id="showNumbersResult"></p>
+    <button onclick="show_numbers()">未取出顯示</button>
+    <p id="show_numbers_result"></p>
 
     <hr>
     <!-- 初始化按鈕 -->
     <button onclick="init_numbers()">初始化</button>
-    <p id="initResult"></p>
+    <p id="init_result"></p>
 
     <script>
+        const result_list = document.getElementById('result_list');
 
-        const resultSpan = document.getElementById('getNumberResultAll');
+        const result = document.getElementById('result_container');
+        const show_span = document.getElementById('show_numbers_result');
 
         function get_random_number() {
-            fetch('/number/get/{{ num_count }}/{{ identifier }}/')
+            fetch('/number/get/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
                     // 更新取數字結果
                     console.log(data)
                     if (data.random_number){
-                        resultSpan.innerHTML += `<span>${JSON.stringify(data.random_number)}</span><br>`;
-                        resultSpan.innerHTML += `<br/>`
+                        result.innerHTML = `<span>${JSON.stringify(data.random_number)}</span><br>`;
+                        result_list.innerHTML += data.random_number +',  '
+
                     }else{
-                        resultSpan.innerHTML += `<span>${JSON.stringify(data.message)},數字已全被抽光了 </span><br>`;
+                        result.innerHTML = `<span>${JSON.stringify(data.message)},數字已全被抽光了 </span><br>`;
                     }
                 });
         }
 
         function show_numbers() {
-            fetch('/number/show/{{ num_count }}/{{ identifier }}/')
+            fetch('/number/show/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
-                    // 更新顯示結果
-                    document.getElementById('showNumbersResult').innerText = `顯示結果：${JSON.stringify(data.number_set)}`;
+                    if (data.ok){
+                        const itemsResult = data.number_set.join(' , ');
+                        show_span.innerText = `顯示結果：${itemsResult}`;
+                    }else{
+                        show_span.innerHTML = `<span> 請初始化, 已被抽光了 </span><br>`;
+                    }
                 });
         }
 
         function init_numbers() {
-            fetch('/number/init/{{ num_count }}/{{ identifier }}/')
+            fetch('/number/init/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
                     // 更新初始化结果
                     if (data.ok){
-                        document.getElementById('initResult').innerText = `初始化結果：${JSON.stringify(data.number_set)}`;
-                        resultSpan.innerHTML = "";
+                        document.getElementById('init_result').innerText = `初始化結果：${JSON.stringify(data.number_set)}`;
+                        result.innerHTML = "";
+                        result_list.innerHTML = "";
+                        show_span.innerHTML = "";
                     }else{
-                        document.getElementById('initResult').innerText = `初始化結果：${JSON.stringify(data.message)}`;
+                        document.getElementById('init_result').innerText = `初始化結果：${JSON.stringify(data.message)}`;
                     }
                 });
         }
+
+        // 檢核網址正確性
+        function check_url() {
+            fetch('/number/check/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    // 更新初始化结果
+                    if (data.ok){
+                    }else{
+                        let url = '/number/';
+                        window.location.href = url;
+                    }
+                });
+        }
+        check_url()
     </script>
 
 </body>

@@ -4,19 +4,51 @@ from django.views import View
 from django_redis import get_redis_connection
 from django.core.cache import cache
 import random
+import json
+import uuid
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def main(request):
+    if request.method == 'POST':
+        # 從 POST 請求中獲取數據
+        try:
+            data = json.loads(request.body)
+
+            # 生成 UUID
+            identifier = str(uuid.uuid4())
+
+            cache_key = f'number_set_{identifier}'
+
+            existing_numbers_set = cache.get(cache_key)
+
+            if existing_numbers_set:
+                content = {'ok': False, 'message': f' {cache_key} 已存在資料，請更換。'}
+            else:
+                numbers = list(range(1, int(data['numCount']) + 1))
+                cache.set(cache_key, numbers, 3600)
+                cache.set(cache_key + 'init', numbers, 3600)
+
+                content = {'ok': True, 'numbers': cache.get(cache_key), 'identifier': identifier}
+
+            return JsonResponse(content)
+        except json.JSONDecodeError:
+            # 如果解析 JSON 失敗，返回相應的錯誤
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     return render(request, "number/index.html")
 
-def random_number(request, num_count, identifier):
+def random_number(request, identifier):
+    cache_key = f'number_set_{identifier}'
+    init_numbes_set = cache.get(cache_key + 'init')
+
     context = {
-        'num_count': num_count,
+        'init_numbes_set': init_numbes_set,
         'identifier': identifier,
     }
     return render(request, "number/random_number.html", context)
 
-def number_get(request, num_count, identifier):
-    cache_key = f'number_set_{num_count}_{identifier}'
+def number_get(request, identifier):
+    cache_key = f'number_set_{identifier}'
 
     number_set = cache.get(cache_key, set())
     if not number_set:
@@ -37,24 +69,41 @@ def number_get(request, num_count, identifier):
     return JsonResponse(content)
 
 
-def number_show(request, num_count, identifier):
-    cache_key = f'number_set_{num_count}_{identifier}'
+def number_show(request, identifier):
+    cache_key = f'number_set_{identifier}'
 
-    content = {'number_set': cache.get(cache_key)}
+    existing_numbers_set = cache.get(cache_key)
+    if existing_numbers_set:
+        content = {'ok': True, 'number_set': cache.get(cache_key)}
+    else:
+        content = {'ok': False, 'number_set': cache.get(cache_key)}
+
     return JsonResponse(content)
 
 
-def number_init(request, num_count, identifier):
-    cache_key = f'number_set_{num_count}_{identifier}'
+def number_init(request, identifier):
+    cache_key = f'number_set_{identifier}'
 
     existing_number_set = cache.get(cache_key)
 
     if existing_number_set:
-        content = {'message': f' {cache_key} 已存在資料，請更換。'}
+        content = {'message': f' {cache_key} 已存在資料，不能初始化。'}
     else:
-        numbers = list(range(1, num_count + 1))
-        cache.set(cache_key, numbers, 3600)
+        init_numbers_set = cache.get(cache_key + 'init')
+        cache.set(cache_key, init_numbers_set, 3600)
         content = {'ok': True, 'number_set': cache.get(cache_key)}
+
+    return JsonResponse(content)
+
+def url_check(request, identifier):
+
+    cache_key = f'number_set_{identifier}'
+    init_numbers_set = cache.get(cache_key + 'init')
+
+    if init_numbers_set:
+        content = {'ok': True,}
+    else:
+        content = {'ok': False,}
 
     return JsonResponse(content)
 
