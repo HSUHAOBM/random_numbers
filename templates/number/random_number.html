@@ -38,11 +38,14 @@
     <p id="init_result"></p>
 
     <script>
+        let check_function_end = true;
         const result_list = document.getElementById('result_list');
         const result = document.getElementById('result_container');
         const show_span = document.getElementById('show_numbers_result');
 
         function get_random_number() {
+            if (check_function_end){
+            check_function_end = false;
             fetch('/number/get/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
@@ -55,10 +58,14 @@
                     }else{
                         result.innerHTML = `<span>${JSON.stringify(data.message)},數字已全被抽光了 </span><br>`;
                     }
+                    check_function_end = true;
                 });
+            }
         }
 
         function show_numbers() {
+            if (check_function_end){
+            check_function_end = false;
             fetch('/number/show/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
@@ -68,10 +75,14 @@
                     }else{
                         show_span.innerHTML = `<span> 請初始化, 已被抽光了 </span><br>`;
                     }
+                    check_function_end = true;
                 });
+            }
         }
 
         function init_numbers() {
+            if (check_function_end){
+            check_function_end = false;
             fetch('/number/init/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
@@ -84,7 +95,9 @@
                     }else{
                         document.getElementById('init_result').innerText = `初始化結果：${JSON.stringify(data.message)}`;
                     }
+                    check_function_end = true;
                 });
+            }
         }
 
         // 檢核網址正確性

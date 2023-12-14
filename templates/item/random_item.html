@@ -38,56 +38,68 @@
     <p id="initResult"></p>
 
     <script>
+        let check_function_end = true;
         const result_list = document.getElementById('result_list');
         const result = document.getElementById('result_container');
         const show_span = document.getElementById('showItemsResult');
 
         function get_random_item() {
+        if (check_function_end) {
+            check_function_end = false;
             fetch('/item/get/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
                     // 更新取結果
-                    if (data.ok){
+                    if (data.ok) {
                         result.innerHTML = `<span>${data.random_item}</span><br>`;
-                        result.innerHTML += `<br/>`
-
-                        result_list.innerHTML += data.random_item +',  '
-
-                    }else{
+                        result.innerHTML += `<br/>`;
+                        result_list.innerHTML += data.random_item + ',  ';
+                    } else {
                         result.innerHTML = `<span>${data.message}, 已被抽光了 </span><br>`;
                     }
+                    check_function_end = true;
                 });
+            }
         }
 
         function show_items() {
+        if (check_function_end) {
+            check_function_end = false;
             fetch('/item/show/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
                     // 更新顯示結果
-                    if (data.ok){
+                    if (data.ok) {
                         const itemsResult = data.items_set.join(' ');
                         show_span.innerText = `顯示結果：${itemsResult}`;
-                    }else{
+                    } else {
                         show_span.innerHTML = `<span> 請初始化, 已被抽光了 </span><br>`;
                     }
+                    check_function_end = true;
                 });
+            }
         }
 
         function init_items() {
+        if (check_function_end) {
+            check_function_end = false;
             fetch('/item/init/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
                     // 更新初始化结果
-                    if (data.ok){
+                    if (data.ok) {
                         document.getElementById('initResult').innerText = `初始化結果：${data.items_set.join(' ')}`;
                         result.innerHTML = "";
                         result_list.innerHTML = "";
                         show_span.innerHTML = "";
-                    }else{
+                    } else {
                         document.getElementById('initResult').innerText = `初始化結果：${data.message}`;
                     }
+                    check_function_end = true;
                 });
+            }
         }
+
         // 檢核網址正確性
         function check_url() {
             fetch('/item/check/{{ identifier }}/')
