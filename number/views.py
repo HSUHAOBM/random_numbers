@@ -8,6 +8,7 @@ import json
 import uuid
 from django.views.decorators.csrf import csrf_exempt
 
+
 @csrf_exempt
 def main(request):
     if request.method == 'POST':
@@ -29,13 +30,17 @@ def main(request):
                 cache.set(cache_key, numbers, 3600)
                 cache.set(cache_key + 'init', numbers, 3600)
 
-                content = {'ok': True, 'numbers': cache.get(cache_key), 'identifier': identifier}
+                content = {'ok': True, 'numbers': cache.get(
+                    cache_key), 'identifier': identifier}
 
             return JsonResponse(content)
         except json.JSONDecodeError:
             # 如果解析 JSON 失敗，返回相應的錯誤
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     return render(request, "number/index.html")
+
+# 抽取頁
+
 
 def random_number(request, identifier):
     cache_key = f'number_set_{identifier}'
@@ -46,6 +51,9 @@ def random_number(request, identifier):
         'identifier': identifier,
     }
     return render(request, "number/random_number.html", context)
+
+# 取數字
+
 
 def number_get(request, identifier):
     cache_key = f'number_set_{identifier}'
@@ -68,6 +76,8 @@ def number_get(request, identifier):
     content = {'ok': True, 'random_number': random_number}
     return JsonResponse(content)
 
+# 顯示未抽
+
 
 def number_show(request, identifier):
     cache_key = f'number_set_{identifier}'
@@ -79,6 +89,28 @@ def number_show(request, identifier):
         content = {'ok': False, 'number_set': cache.get(cache_key)}
 
     return JsonResponse(content)
+
+# 顯示已抽
+
+
+def number_get_show(request, identifier):
+    cache_key = f'number_set_{identifier}'
+
+    init_numbers_set = cache.get(cache_key + 'init')
+    existing_numbers_set = cache.get(cache_key)
+
+    # 計算列表差異
+    remaining_numbers_set = list(
+        set(init_numbers_set) - set(existing_numbers_set))
+
+    if remaining_numbers_set:
+        content = {'ok': True, 'number_set': remaining_numbers_set}
+    else:
+        content = {'ok': False, 'number_set': remaining_numbers_set}
+
+    return JsonResponse(content)
+
+# 初始化
 
 
 def number_init(request, identifier):
@@ -95,17 +127,21 @@ def number_init(request, identifier):
 
     return JsonResponse(content)
 
+# 網址檢查
+
+
 def url_check(request, identifier):
 
     cache_key = f'number_set_{identifier}'
     init_numbers_set = cache.get(cache_key + 'init')
 
     if init_numbers_set:
-        content = {'ok': True,}
+        content = {'ok': True, }
     else:
-        content = {'ok': False,}
+        content = {'ok': False, }
 
     return JsonResponse(content)
+
 
 def clear_cache(repuest):
     cache.clear()
