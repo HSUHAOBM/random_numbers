@@ -39,7 +39,10 @@
 
     <!-- 顯示按鈕 -->
     <button onclick="show_items()">未取出顯示</button>
-    <p id="showItemsResult"></p>
+    <p id="show_items_result"></p>
+    <button onclick="show_get_numbers()">已抽出顯示</button>
+    <p id="show_get_numbers_result"></p>
+
 
     <hr>
     <!-- 初始化按鈕 -->
@@ -50,8 +53,10 @@
         let check_function_end = true;
         const result_list = document.getElementById('result_list');
         const result = document.getElementById('result_container');
-        const show_span = document.getElementById('showItemsResult');
+        const show_span = document.getElementById('show_items_result');
+        const show_get_span = document.getElementById('show_get_numbers_result');
 
+        // 隨機取值
         function get_random_item() {
         if (check_function_end) {
             check_function_end = false;
@@ -71,6 +76,24 @@
             }
         }
 
+        // 顯示抽取過
+        function show_get_numbers() {
+            if (check_function_end){
+            check_function_end = false;
+            fetch('/item/show_get/{{ identifier }}/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok){
+                        const itemsResult = data.items_set.join(' , ');
+                        show_get_span.innerText = `顯示結果：${itemsResult}`;
+                    }else{
+                        show_get_span.innerHTML = `<span> 還沒開始抽 </span><br>`;
+                    }
+                    check_function_end = true;
+                });
+            }
+        }
+        // 顯示未抽取
         function show_items() {
         if (check_function_end) {
             check_function_end = false;
@@ -79,7 +102,7 @@
                 .then(data => {
                     // 更新顯示結果
                     if (data.ok) {
-                        const itemsResult = data.items_set.join(' ');
+                        const itemsResult = data.items_set.join(' , ');
                         show_span.innerText = `顯示結果：${itemsResult}`;
                     } else {
                         show_span.innerHTML = `<span> 請初始化, 已被抽光了 </span><br>`;
@@ -89,6 +112,7 @@
             }
         }
 
+        // 初始化
         function init_items() {
         if (check_function_end) {
             check_function_end = false;
@@ -101,6 +125,7 @@
                         result.innerHTML = "";
                         result_list.innerHTML = "";
                         show_span.innerHTML = "";
+                        show_get_span.innerHTML = "";
                     } else {
                         document.getElementById('initResult').innerText = `初始化結果：${data.message}`;
                     }

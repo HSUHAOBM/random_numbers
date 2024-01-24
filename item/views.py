@@ -11,6 +11,7 @@ import uuid
 from django.views.decorators.csrf import csrf_exempt
 from django.core.signing import Signer
 
+
 @csrf_exempt
 def main(request):
     if request.method == 'POST':
@@ -32,7 +33,8 @@ def main(request):
                 cache.set(cache_key, items, 3600)
                 cache.set(cache_key + 'init', items, 3600)
 
-                content = {'ok': True, 'items': cache.get(cache_key), 'identifier': identifier}
+                content = {'ok': True, 'items': cache.get(
+                    cache_key), 'identifier': identifier}
 
             return JsonResponse(content)
         except json.JSONDecodeError:
@@ -40,6 +42,8 @@ def main(request):
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     return render(request, "item/index.html")
 
+
+# 抽取頁
 def item_result(request, identifier):
 
     cache_key = f'item_set_{identifier}'
@@ -52,7 +56,7 @@ def item_result(request, identifier):
     return render(request, "item/random_item.html", context)
 
 
-
+# 取值
 def item_get(request, identifier):
     cache_key = f'item_set_{identifier}'
 
@@ -75,6 +79,7 @@ def item_get(request, identifier):
     return JsonResponse(content)
 
 
+# 顯示未抽
 def item_show(request, identifier):
 
     cache_key = f'item_set_{identifier}'
@@ -87,6 +92,25 @@ def item_show(request, identifier):
     return JsonResponse(content)
 
 
+# 顯示已抽
+def item_get_show(request, identifier):
+    cache_key = f'item_set_{identifier}'
+
+    existing_items_set = cache.get(cache_key)
+    init_items_set = cache.get(cache_key + 'init')
+    # 計算列表差異
+    remaining_items_set = list(
+        set(init_items_set) - set(existing_items_set))
+
+    if remaining_items_set:
+        content = {'ok': True, 'items_set': remaining_items_set}
+    else:
+        content = {'ok': False, 'items_set': remaining_items_set}
+
+    return JsonResponse(content)
+
+
+# 初始化
 def item_init(request, identifier):
 
     cache_key = f'item_set_{identifier}'
@@ -103,17 +127,19 @@ def item_init(request, identifier):
     return JsonResponse(content)
 
 
+# 網址檢查
 def url_check(request, identifier):
 
     cache_key = f'item_set_{identifier}'
     init_items_set = cache.get(cache_key + 'init')
 
     if init_items_set:
-        content = {'ok': True,}
+        content = {'ok': True, }
     else:
-        content = {'ok': False,}
+        content = {'ok': False, }
 
     return JsonResponse(content)
+
 
 def clear_cache(repuest):
     cache.clear()

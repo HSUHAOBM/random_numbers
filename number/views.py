@@ -39,9 +39,8 @@ def main(request):
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     return render(request, "number/index.html")
 
+
 # 抽取頁
-
-
 def random_number(request, identifier):
     cache_key = f'number_set_{identifier}'
     init_numbes_set = cache.get(cache_key + 'init')
@@ -52,9 +51,8 @@ def random_number(request, identifier):
     }
     return render(request, "number/random_number.html", context)
 
+
 # 取數字
-
-
 def number_get(request, identifier):
     cache_key = f'number_set_{identifier}'
 
@@ -76,9 +74,8 @@ def number_get(request, identifier):
     content = {'ok': True, 'random_number': random_number}
     return JsonResponse(content)
 
+
 # 顯示未抽
-
-
 def number_show(request, identifier):
     cache_key = f'number_set_{identifier}'
 
@@ -90,9 +87,8 @@ def number_show(request, identifier):
 
     return JsonResponse(content)
 
+
 # 顯示已抽
-
-
 def number_get_show(request, identifier):
     cache_key = f'number_set_{identifier}'
 
@@ -110,9 +106,8 @@ def number_get_show(request, identifier):
 
     return JsonResponse(content)
 
+
 # 初始化
-
-
 def number_init(request, identifier):
     cache_key = f'number_set_{identifier}'
 
@@ -127,9 +122,8 @@ def number_init(request, identifier):
 
     return JsonResponse(content)
 
+
 # 網址檢查
-
-
 def url_check(request, identifier):
 
     cache_key = f'number_set_{identifier}'
