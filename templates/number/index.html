@@ -16,13 +16,24 @@
 <body>
     <form id="numberForm">
         <label for="num_count">請輸入隨機數字的最大值：</label>
-        <input type="number" name="num_count" id="num_count" required>
+        <input type="number" name="num_count" id="num_count" required min="2" max="99">
+
         <input type="button" value="提交" onclick="submitForm()">
     </form>
     <script>
         async function submitForm() {
             let numCount = document.getElementById('num_count').value;
+            // 检查输入是否为空
+            if (numCount === '') {
+                alert('輸入數值');
+                return;
+            }
 
+            // 检查输入是否在有效范围内
+            if (numCount < 2 || numCount > 99) {
+                alert('有效的数字（2 到 99）');
+                return;
+            }
 
             // 使用 fetch 發送 POST 請求到後端處理跳轉
             fetch('/number/', {
