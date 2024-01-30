@@ -7,6 +7,7 @@ import random
 from django.urls import reverse
 import json
 import uuid
+import time
 
 from django.views.decorators.csrf import csrf_exempt
 from django.core.signing import Signer
@@ -58,6 +59,9 @@ def item_result(request, identifier):
 
 # 取值
 def item_get(request, identifier):
+
+    time.sleep(1)
+
     cache_key = f'item_set_{identifier}'
 
     items_set = cache.get(cache_key, set())
