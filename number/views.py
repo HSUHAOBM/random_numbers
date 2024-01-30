@@ -43,9 +43,6 @@ def main(request):
 
 # 抽取頁
 def random_number(request, identifier):
-
-    time.sleep(1)
-
     cache_key = f'number_set_{identifier}'
     init_numbes_set = cache.get(cache_key + 'init')
 
@@ -58,6 +55,9 @@ def random_number(request, identifier):
 
 # 取數字
 def number_get(request, identifier):
+
+    time.sleep(1)
+
     cache_key = f'number_set_{identifier}'
 
     number_set = cache.get(cache_key, set())

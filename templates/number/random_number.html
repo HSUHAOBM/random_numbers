@@ -11,13 +11,22 @@
             font-size: 30px;
         }
         #result_container{
-            margin: 2em;
             font-size: 2em;
             font-weight: bold;
             text-align: center;
         }
         body{
             margin: 40px;
+        }
+        #loading_gif{
+            text-align: center;
+            width: 50px;
+        }
+        #centeredContainer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
         }
     </style>
 </head>
@@ -34,7 +43,10 @@
         <p>取數字結果：</p>
         <div id="result_list"></div>
         <br>
-        <div id="result_container"></div>
+        <div id="centeredContainer">
+            <img id="loading_gif" src="{% static 'ajax-loader.gif' %}" style="display: none;">
+            <div id="result_container"></div>
+        </div>
     </div>
 
     <hr>
@@ -62,6 +74,10 @@
         function get_random_number() {
             if (check_function_end){
             check_function_end = false;
+            let loading_gif = document.getElementById("loading_gif");
+            loading_gif.style.display = "block";
+            result.innerHTML = ""
+
             fetch('/number/get/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
@@ -74,6 +90,7 @@
                         result.innerHTML = `<span>${JSON.stringify(data.message)},已全被抽光了 </span><br>`;
                     }
                     check_function_end = true;
+                    loading_gif.style.display = "none";
                 });
             }
         }
