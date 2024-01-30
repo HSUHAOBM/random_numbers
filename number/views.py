@@ -7,6 +7,7 @@ import random
 import json
 import uuid
 from django.views.decorators.csrf import csrf_exempt
+import time
 
 
 @csrf_exempt
@@ -42,6 +43,9 @@ def main(request):
 
 # 抽取頁
 def random_number(request, identifier):
+
+    time.sleep(1)
+
     cache_key = f'number_set_{identifier}'
     init_numbes_set = cache.get(cache_key + 'init')
 
