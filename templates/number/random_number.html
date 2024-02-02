@@ -7,61 +7,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>隨機數字操作</title>
     <style>
-        #get_number{
-            font-size: 30px;
-        }
-        #result_container{
-            font-size: 2em;
-            font-weight: bold;
-            text-align: center;
-        }
-        body{
-            margin: 40px;
-        }
-        #loading_gif{
-            text-align: center;
-            width: 50px;
-        }
-        #centeredContainer {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 200px;
-        }
+        
     </style>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="stylesheet" href="{% static 'animate.min.css' %}" />
 </head>
 <body>
-    <h1>隨機數字操作</h1>
-    「 {{ init_numbes_set|join:' , ' }} 」
-    <br>
-    <hr>
-    <br>
 
     <!-- 取數字按鈕 -->
-    <button onclick="get_random_number()">取數字</button>
+    <button onclick="get_random_number()" class="btn-generate">抽取</button>
     <div id="get_number">
-        <p>取數字結果：</p>
-        <div id="result_list"></div>
-        <br>
+        <h1 class="title"></h1>
         <div id="centeredContainer">
-            <img id="loading_gif" src="{% static 'ajax-loader.gif' %}" style="display: none;">
-            <div id="result_container"></div>
+            <!-- <img id="loading_gif" src="{% static 'ajax-loader.gif' %}" style="display: none;"> -->
+            <div id="result_container" class="result_now" style="display: none;"></div>
         </div>
+        <!-- <div id="result_now"></div> -->
+        <div id="result_list" class="result_list"></div>
     </div>
 
-    <hr>
 
-    <!-- 顯示按鈕 -->
-    <button onclick="show_numbers()">未取出顯示</button>
-    <p id="show_numbers_result"></p>
+    <div class="box-detail">
+        <p>隨機數字操作：{{ init_numbes_set|join:' , ' }}</p>
 
-    <button onclick="show_get_numbers()">已抽出顯示</button>
-    <p id="show_get_numbers_result"></p>
+        <!-- 顯示按鈕 -->
+        <button onclick="show_numbers()">未取出顯示</button>
+        <p id="show_numbers_result"></p>
 
-    <hr>
-    <!-- 初始化按鈕 -->
-    <button onclick="init_numbers()">初始化</button>
-    <p id="init_result"></p>
+        <button onclick="show_get_numbers()">已抽出顯示</button>
+        <p id="show_get_numbers_result"></p>
+
+        <!-- 初始化按鈕 -->
+        <button onclick="init_numbers()">初始化</button>
+        <p id="init_result"></p>
+    </div>
+    
 
     <script>
         let check_function_end = true;
@@ -72,25 +52,33 @@
 
         // 隨機取值
         function get_random_number() {
+            result.style.display = 'none';
+
             if (check_function_end){
             check_function_end = false;
-            let loading_gif = document.getElementById("loading_gif");
-            loading_gif.style.display = "block";
-            result.innerHTML = ""
+            //let loading_gif = document.getElementById("loading_gif");
+            //loading_gif.style.display = "block";
+            // result.innerHTML = ""
 
             fetch('/number/get/{{ identifier }}/')
                 .then(response => response.json())
                 .then(data => {
                     // 更新取數字結果
                     if (data.random_number){
+                        result.style.display = '';
+                        result.classList.add("animate__animated","animate__flipInX");
+                        result.addEventListener('animationend', () => {
+                            result.classList.remove("animate__animated","animate__flipInX");
+                        });
                         result.innerHTML = `<span>${JSON.stringify(data.random_number)}</span><br>`;
-                        result_list.innerHTML += data.random_number +',  '
-
+                        result_list.innerHTML += '<span>' + data.random_number +'</span>';
+                        //result_now.innerHTML = data.random_number;
                     }else{
-                        result.innerHTML = `<span>${JSON.stringify(data.message)},已全被抽光了 </span><br>`;
+                        // result.innerHTML = `<span>${JSON.stringify(data.message)},已全被抽光了 </span><br>`;
+                        alert("請初始化");
                     }
                     check_function_end = true;
-                    loading_gif.style.display = "none";
+                    //loading_gif.style.display = "none";
                 });
             }
         }
@@ -125,7 +113,8 @@
                         const itemsResult = data.number_set.join(' , ');
                         show_span.innerText = `顯示結果：${itemsResult}`;
                     }else{
-                        show_span.innerHTML = `<span> 請初始化, 已被抽光了 </span><br>`;
+                        // show_span.innerHTML = `<span> 請初始化, 已被抽光了 </span><br>`;
+                        alert("請初始化");
                     }
                     check_function_end = true;
                 });
